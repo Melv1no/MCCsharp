@@ -14,6 +14,8 @@ public class MinecraftData
     private readonly Dictionary<string, Item> itemsByName = new();
     private List<JObject> recipesRaw = new();
     private static DataPaths? dataPaths;
+    private List<Item> allItems = new();
+    private List<Recipe> allRecipes = new();
 
     public MinecraftData(Platform platform, string version)
     {
@@ -23,15 +25,39 @@ public class MinecraftData
         LoadRecipes();
     }
 
+    public List<Item> Items => allItems;
+    public List<Recipe> Recipes => allRecipes;
+
+    public List<Item> SearchItems(string query, int limit = 10)
+    {
+        return allItems
+            .Where(i => i.Name.Contains(query, StringComparison.OrdinalIgnoreCase))
+            .Take(limit)
+            .ToList();
+    }
+
+    public string GetFormattedRecipe(Recipe recipe)
+    {
+        var counts = new Dictionary<string, int>();
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {
+                var item = recipe.Matrix[y, x];
+                if (item == null) continue;
+                if (!counts.ContainsKey(item.Name))
+                    counts[item.Name] = 0;
+                counts[item.Name]++;
+            }
+        }
+        return string.Join(" ", counts.Select(kv => $"{kv.Value}x{kv.Key}"));
+    }
+
     public static Dictionary<string, List<(string version, bool hasRecipes)>> GetAvailableVersions()
     {
         if (dataPaths == null)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-data", "data", "dataPaths.json");
-            if (!File.Exists(path))
-                throw new FileNotFoundException("Fichier dataPaths.json introuvable");
-
-            var json = File.ReadAllText(path);
+            var json = ReadEmbeddedResource("data.dataPaths.json");
             dataPaths = JsonConvert.DeserializeObject<DataPaths>(json)
                         ?? throw new Exception("Impossible de parser dataPaths.json");
         }
@@ -61,16 +87,12 @@ public class MinecraftData
     {
         if (dataPaths == null)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-data", "data", "dataPaths.json");
-            if (!File.Exists(path))
-                throw new FileNotFoundException("Fichier dataPaths.json introuvable");
-
-            var json = File.ReadAllText(path);
+            var json = ReadEmbeddedResource("data.dataPaths.json");
             dataPaths = JsonConvert.DeserializeObject<DataPaths>(json)
                         ?? throw new Exception("Impossible de parser dataPaths.json");
         }
 
-        var platformKey = platform.ToString().ToLower(); // "pc" ou "bedrock"
+        var platformKey = platform.ToString().ToLower();
 
         if (!dataPaths.TryGetValue(platformKey, out var versions))
             throw new ArgumentException($"Plateforme inconnue : {platform}");
@@ -90,33 +112,22 @@ public class MinecraftData
     private void LoadItems()
     {
         var (_, itemsPath) = ResolvePaths(platform, version);
+        var json = ReadEmbeddedResource($"data.{itemsPath.Replace("/", ".")}.items.json");
 
-        var path = Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-data", "data", itemsPath, "items.json");
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"items.json introuvable à : {path}");
-
-        var json = File.ReadAllText(path);
-        var items = JsonConvert.DeserializeObject<List<Item>>(json) ?? new();
-
-        foreach (var item in items)
+        allItems = JsonConvert.DeserializeObject<List<Item>>(json) ?? new();
+        foreach (var item in allItems)
         {
             itemsById[item.Id] = item;
             itemsByName[item.Name.ToLower()] = item;
         }
     }
 
-
     private void LoadRecipes()
     {
         var (recipesPath, _) = ResolvePaths(platform, version);
+        var json = ReadEmbeddedResource($"data.{recipesPath.Replace("/", ".")}.recipes.json");
 
-        var path = Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-data", "data", recipesPath, "recipes.json");
-        if (!File.Exists(path))
-            throw new FileNotFoundException($"recipes.json introuvable à : {path}");
-
-        var json = File.ReadAllText(path);
         var dict = JsonConvert.DeserializeObject<Dictionary<string, JToken>>(json) ?? new();
-
         foreach (var entry in dict.Values)
         {
             if (entry.Type == JTokenType.Array)
@@ -129,22 +140,20 @@ public class MinecraftData
                 recipesRaw.Add((JObject)entry);
             }
         }
+
+        allRecipes = recipesRaw.Select(r => TryParseRecipe(r)).Where(r => r != null).ToList()!;
     }
 
     public static string GetLatestVersionWithRecipes(Platform platform)
     {
         if (dataPaths == null)
         {
-            var path = Path.Combine(AppContext.BaseDirectory, "Data", "minecraft-data", "dataPaths.json");
-            if (!File.Exists(path))
-                throw new FileNotFoundException("Fichier dataPaths.json introuvable");
-
-            var json = File.ReadAllText(path);
+            var json = ReadEmbeddedResource("data.dataPaths.json");
             dataPaths = JsonConvert.DeserializeObject<DataPaths>(json)
                         ?? throw new Exception("Impossible de parser dataPaths.json");
         }
 
-        var platformKey = platform.ToString().ToLower(); // "pc" ou "bedrock"
+        var platformKey = platform.ToString().ToLower();
 
         if (!dataPaths.TryGetValue(platformKey, out var versions))
             throw new ArgumentException($"Plateforme inconnue : {platform}");
@@ -152,7 +161,7 @@ public class MinecraftData
         var candidates = versions
             .Where(kv => !string.IsNullOrWhiteSpace(kv.Value.Recipes))
             .Select(kv => kv.Key)
-            .OrderByDescending(v => v, StringComparer.OrdinalIgnoreCase) // pour trier alphanum
+            .OrderByDescending(v => v, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
         if (!candidates.Any())
@@ -160,8 +169,6 @@ public class MinecraftData
 
         return candidates.First();
     }
-
-
 
     public Item GetItemByIdOrName(string idOrName)
     {
@@ -174,22 +181,27 @@ public class MinecraftData
         throw new ArgumentException($"Aucun item trouvé avec '{idOrName}'");
     }
 
-   public Recipe GetRecipe(Item item)
-{
-    foreach (var recipe in recipesRaw)
+    public Recipe? GetRecipe(Item item)
+    {
+        return allRecipes.FirstOrDefault(r => r.Result?.Name == item.Name);
+    }
+
+    private Recipe? TryParseRecipe(JObject recipe)
     {
         var result = recipe["result"];
-        if (result == null) continue;
+        if (result == null) return null;
 
         int resultId = result["id"]?.Value<int>() ?? -1;
         int resultMeta = result["metadata"]?.Value<int>() ?? 0;
+        int resultCount = result["count"]?.Value<int>() ?? 1;
 
-        if (resultId != item.Id) continue;
+        if (!itemsById.TryGetValue(resultId, out var resultItem))
+            return null;
+
+        var matrix = new Item?[3, 3];
 
         if (recipe["inShape"] is JArray shape)
         {
-            var matrix = new Item?[3, 3];
-
             for (int y = 0; y < shape.Count && y < 3; y++)
             {
                 if (shape[y] is not JArray row) continue;
@@ -197,73 +209,71 @@ public class MinecraftData
                 for (int x = 0; x < row.Count && x < 3; x++)
                 {
                     var cell = row[x];
-
                     if (cell == null || cell.Type == JTokenType.Null)
                         continue;
 
                     int ingredientId = -1;
-                    int ingredientMeta = 0;
-
                     if (cell.Type == JTokenType.Integer)
-                    {
                         ingredientId = cell.Value<int>();
-                    }
                     else if (cell.Type == JTokenType.Object)
-                    {
                         ingredientId = cell["id"]?.Value<int>() ?? -1;
-                        ingredientMeta = cell["metadata"]?.Value<int>() ?? 0;
-                    }
 
                     if (itemsById.TryGetValue(ingredientId, out var ing))
-                    {
-                        matrix[y, x] = ing; // Option : tu peux vérifier metadata si tu veux
-                    }
+                        matrix[y, x] = ing;
                 }
             }
-
-            return new Recipe
-            {
-                Result = item,
-                ResultCount = result["count"]?.Value<int>() ?? 1,
-                Matrix = matrix
-            };
         }
-
-        // Support shapeless (flat list)
-        if (recipe["ingredients"] is JArray ingList)
+        else if (recipe["ingredients"] is JArray ingList)
         {
-            var matrix = new Item?[3, 3];
-
             for (int i = 0; i < Math.Min(ingList.Count, 9); i++)
             {
                 var ing = ingList[i];
-
                 int ingredientId = -1;
 
                 if (ing.Type == JTokenType.Integer)
-                {
                     ingredientId = ing.Value<int>();
-                }
                 else if (ing.Type == JTokenType.Object)
-                {
                     ingredientId = ing["id"]?.Value<int>() ?? -1;
-                }
 
                 if (itemsById.TryGetValue(ingredientId, out var it))
-                {
                     matrix[i / 3, i % 3] = it;
-                }
             }
-
-            return new Recipe
-            {
-                Result = item,
-                ResultCount = result["count"]?.Value<int>() ?? 1,
-                Matrix = matrix
-            };
         }
+
+        return new Recipe
+        {
+            Result = resultItem,
+            ResultCount = resultCount,
+            Matrix = matrix
+        };
     }
 
-    throw new InvalidOperationException($"Aucune recette trouvée pour l’item {item.Name} (ID: {item.Id})");
-}
+ private static string ReadEmbeddedResource(string relativePath)
+ {
+     var cleanedPath = relativePath
+         .Replace("\\", ".")
+         .Replace("/", ".");
+ 
+     cleanedPath = System.Text.RegularExpressions.Regex.Replace(
+         cleanedPath,
+         @"(?<=\.)((\d+)(\.\d+)+)(?=\.)",
+         m => "_" + m.Value.Replace(".", "._")
+     );
+ 
+     var resourceName = $"MCCsharp.Data.minecraft_data.{cleanedPath}";
+ 
+     var assembly = typeof(MinecraftData).Assembly;
+     using var stream = assembly.GetManifestResourceStream(resourceName);
+ 
+     if (stream == null)
+     {
+         var all = string.Join("\n - ", assembly.GetManifestResourceNames());
+         throw new FileNotFoundException($"❌ Resource '{resourceName}' not found in assembly.\n\n📦 Ressources disponibles :\n - {all}");
+     }
+ 
+     using var reader = new StreamReader(stream);
+     return reader.ReadToEnd();
+ }
+
+
 }

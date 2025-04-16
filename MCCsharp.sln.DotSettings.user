@@ -1,4 +1,9 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/AddReferences/RecentPaths/=C_003A_005CUsers_005Cmolivet_005CRiderProjects_005CMCCsharp_005CMCCsharp_005Cbin_005CRelease_005Cnet9_002E0_005CMCCsharp_002Edll/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
+  &lt;Assembly Path="C:\Users\molivet\RiderProjects\MCCsharp\MCCsharp\bin\Debug\net7.0\MCCsharp.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\molivet\RiderProjects\MCCsharp\MCCsharp\bin\Release\net9.0\MCCsharp.dll" /&gt;&#xD;
+&lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=81356577_002Ddec5_002D43e2_002Dac82_002De8fee5718881/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetItemById_ShouldReturnCorrectItem" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::CA4EE177-80C7-46C7-BB10-655FE33E28FC::net9.0::MCCsharp.Tests.MinecraftDataTests.GetItemById_ShouldReturnCorrectItem&lt;/TestId&gt;&#xD;

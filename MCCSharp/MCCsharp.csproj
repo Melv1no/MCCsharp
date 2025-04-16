@@ -2,14 +2,14 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFrameworks>net7.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 
         <!-- NuGet package info -->
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>MCCsharp</PackageId>
-        <Version>1.0.0</Version>
+        <Version>1.0.2</Version>
         <Authors>Melv1no</Authors>
         <Description>Wrapper C# de minecraft-data. Permet d'accéder aux objets Minecraft et leurs recettes via une API simple.</Description>
         <PackageTags>Minecraft Recipes Items Wrapper Data</PackageTags>
@@ -22,16 +22,10 @@
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
     <ItemGroup>
-        <Content Include="Data\minecraft-data\data\**\*.*">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Pack>true</Pack>
-            <PackagePath>contentFiles\any\any\Data\minecraft-data\data</PackagePath>
-        </Content>
-        <Content Include="Data\minecraft-data\data\dataPaths.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Pack>true</Pack>
-            <PackagePath>contentFiles\any\any\Data\minecraft-data</PackagePath>
-        </Content>
+        <EmbeddedResource Include="Data\minecraft-data\data\pc\**\*.json" />
+        <EmbeddedResource Include="Data\minecraft-data\data\bedrock\**\*.json" />
+        <EmbeddedResource Include="Data\minecraft-data\data\dataPaths.json" />
     </ItemGroup>
+
 
 </Project>

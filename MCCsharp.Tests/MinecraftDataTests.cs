@@ -79,5 +79,13 @@ public class MinecraftDataTests
         Assert.False(string.IsNullOrWhiteSpace(latest));
     }
 
-
+    [Fact]
+    public void SearchItems_ShouldReturnMatchingItems()
+    {
+        var mc = new MinecraftData(Platform.Pc, "1.17");
+        var matches = mc.SearchItems("door", 10);
+        
+        Assert.NotEmpty(matches);
+        Assert.Contains(matches, i => i.Name.Contains("door"));
+    }
 }
