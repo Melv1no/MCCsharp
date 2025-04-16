@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <!-- NuGet package info -->
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>MCCsharp</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>Melv1no</Authors>
+        <Description>Wrapper C# de minecraft-data. Permet d'accéder aux objets Minecraft et leurs recettes via une API simple.</Description>
+        <PackageTags>Minecraft Recipes Items Wrapper Data</PackageTags>
+        <RepositoryUrl>https://github.com/Melv1no/MCCsharp</RepositoryUrl> <!-- optionnel -->
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <!-- Inclure les données JSON dans le dossier de sortie -->
+    <ItemGroup>
+        <Content Include="Data\minecraft-data\data\**\*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackagePath>contentFiles\any\any\Data\minecraft-data\data</PackagePath>
+        </Content>
+        <Content Include="Data\minecraft-data\data\dataPaths.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackagePath>contentFiles\any\any\Data\minecraft-data</PackagePath>
+        </Content>
+    </ItemGroup>
+
+</Project>

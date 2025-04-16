@@ -1,0 +1,9 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=81356577_002Ddec5_002D43e2_002Dac82_002De8fee5718881/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetItemById_ShouldReturnCorrectItem" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::CA4EE177-80C7-46C7-BB10-655FE33E28FC::net9.0::MCCsharp.Tests.MinecraftDataTests.GetItemById_ShouldReturnCorrectItem&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::CA4EE177-80C7-46C7-BB10-655FE33E28FC::net9.0::MCCsharp.Tests.MinecraftDataTests.GetRecipe_WithVersionWithoutRecipes_ShouldThrow&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::CA4EE177-80C7-46C7-BB10-655FE33E28FC::net9.0::MCCsharp.Tests.MinecraftDataTests.GetRecipe_ShouldContainCorrectIngredients&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::CA4EE177-80C7-46C7-BB10-655FE33E28FC::net9.0::MCCsharp.Tests.MinecraftDataTests.GetLatestVersionWithRecipes_ShouldReturnValidVersion&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

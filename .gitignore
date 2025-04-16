@@ -1,0 +1,6 @@
+MCCsharp/bin/*
+MCCsharp/obj/*
+MCCsharp.TestApp/obj/*
+MCCsharp.TestApp/bin/*
+MCCsharp.Tests/obj/*
+MCCsharp.Tests/bin/*
