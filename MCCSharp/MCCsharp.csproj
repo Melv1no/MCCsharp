@@ -13,14 +13,14 @@
         <Authors>Melv1no</Authors>
         <Description>Wrapper C# de minecraft-data. Permet d'accéder aux objets Minecraft et leurs recettes via une API simple.</Description>
         <PackageTags>Minecraft Recipes Items Wrapper Data</PackageTags>
-        <RepositoryUrl>https://github.com/Melv1no/MCCsharp</RepositoryUrl> <!-- optionnel -->
+        <RepositoryUrl>https://github.com/Melv1no/MCCsharp</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     </ItemGroup>
-
-    <!-- Inclure les données JSON dans le dossier de sortie -->
     <ItemGroup>
         <Content Include="Data\minecraft-data\data\**\*.*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
